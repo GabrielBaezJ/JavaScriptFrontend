@@ -14,6 +14,33 @@ h1 {
     margin-bottom: 20px;
 }
 
+.search-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#searchInput {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+#searchInput::placeholder {
+    color: #94a3b8;
+}
+
 button {
     background: #2563eb;
     color: white;

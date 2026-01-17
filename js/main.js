@@ -1,5 +1,6 @@
 const tbody = document.getElementById("data");
 const pdfBtn = document.getElementById("pdfBtn");
+const searchInput = document.getElementById("searchInput");
 
 let articlesGlobal = [];
 
@@ -16,6 +17,27 @@ fetch("https://javascriptbackend-5115.onrender.com/api/articles")
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading articles</td></tr>';
     });
 
+// Función de búsqueda
+searchInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    if (searchTerm === "") {
+        renderTable(articlesGlobal);
+    } else {
+        const filtered = articlesGlobal.filter(article => {
+            const title = (article.title_display || "").toLowerCase();
+            const authors = (article.author_display || []).join(" ").toLowerCase();
+            const doi = (article.id || "").toLowerCase();
+            
+            return title.includes(searchTerm) || 
+                   authors.includes(searchTerm) || 
+                   doi.includes(searchTerm);
+        });
+        
+        renderTable(filtered);
+    }
+});
+
 function formatDate(dateStr) {
     if (!dateStr) return "N/A";
 
@@ -31,6 +53,13 @@ function formatDate(dateStr) {
 }
 
 function renderTable(data) {
+    tbody.innerHTML = "";
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No se encontraron artículos</td></tr>';
+        return;
+    }
+    
     data.forEach((article, index) => {
 
         const title = article.title_display || "No title";
@@ -65,29 +94,101 @@ pdfBtn.addEventListener("click", () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    let y = 10;
-    doc.setFontSize(12);
+    // Configuración del documento
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    const contentWidth = pageWidth - 2 * margin;
+    let y = margin;
 
+    // Título del reporte
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text("PLOS University Articles Report", margin, y);
+    y += 12;
+
+    // Fecha de generación
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    const today = new Date().toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    doc.text(`Generated: ${today}`, margin, y);
+    y += 8;
+
+    doc.text(`Total articles: ${articlesGlobal.length}`, margin, y);
+    y += 15;
+
+    // Línea separadora
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Función para dividir texto largo
+    const splitText = (text, maxWidth) => {
+        return doc.splitTextToSize(text, maxWidth);
+    };
+
+    // Iterar sobre los artículos
     articlesGlobal.forEach((a, index) => {
 
-        doc.text(`Article ${index+1}`, 10, y);
-        y+=7;
-
-        doc.text(`Title: ${a.title_display || "N/A"}`, 10, y);
-        y+=7;
-
-        doc.text(`Date: ${formatDate(a.publication_date)}`, 10, y);
-        y+=7;
-
-        doc.text(`Authors: ${(a.author_display || []).join(", ")}`, 10, y);
-        y+=7;
-
-        doc.text(`DOI: ${a.id}`, 10, y);
-        y+=12;
-
-        if(y > 270){
+        // Verificar si necesitamos una nueva página
+        if(y > pageHeight - 40){
             doc.addPage();
-            y=10;
+            y = margin;
+        }
+
+        // Número de artículo
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Article ${index + 1}`, margin, y);
+        y += 8;
+
+        // Título
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        const titleLines = splitText(`Title: ${a.title_display || "N/A"}`, contentWidth);
+        doc.setFont(undefined, 'normal');
+        titleLines.forEach(line => {
+            if(y > pageHeight - 20){
+                doc.addPage();
+                y = margin;
+            }
+            doc.text(line, margin, y);
+            y += 6;
+        });
+        y += 2;
+
+        // Fecha
+        doc.setFontSize(10);
+        doc.text(`Date: ${formatDate(a.publication_date)}`, margin, y);
+        y += 6;
+
+        // Autores
+        const authorsText = `Authors: ${(a.author_display || []).join(", ")}`;
+        const authorLines = splitText(authorsText, contentWidth);
+        authorLines.forEach(line => {
+            if(y > pageHeight - 20){
+                doc.addPage();
+                y = margin;
+            }
+            doc.text(line, margin, y);
+            y += 6;
+        });
+        y += 2;
+
+        // DOI
+        doc.text(`DOI: ${a.id}`, margin, y);
+        y += 10;
+
+        // Línea separadora entre artículos
+        if (index < articlesGlobal.length - 1) {
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.2);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 10;
         }
     });
 
