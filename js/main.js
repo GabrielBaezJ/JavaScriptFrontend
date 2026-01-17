@@ -30,22 +30,34 @@ searchInput.addEventListener("keypress", (e) => {
 });
 
 function performSearch() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
+    const searchTerm = searchInput.value.trim();
     
     if (searchTerm === "") {
-        renderTable(articlesGlobal);
+        // Reload all articles if search is empty
+        fetch("https://javascriptbackend-5115.onrender.com/api/articles")
+            .then(res => res.json())
+            .then(data => {
+                const articles = data.docs || data;
+                articlesGlobal = articles;
+                renderTable(articles);
+            })
+            .catch(error => {
+                console.error("Error fetching articles:", error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Error loading articles</td></tr>';
+            });
     } else {
-        const filtered = articlesGlobal.filter(article => {
-            const title = (article.title_display || "").toLowerCase();
-            const authors = (article.author_display || []).join(" ").toLowerCase();
-            const doi = (article.id || "").toLowerCase();
-            
-            return title.includes(searchTerm) || 
-                   authors.includes(searchTerm) || 
-                   doi.includes(searchTerm);
-        });
-        
-        renderTable(filtered);
+        // Search via backend API
+        fetch(`https://javascriptbackend-5115.onrender.com/api/articles?search=${encodeURIComponent(searchTerm)}`)
+            .then(res => res.json())
+            .then(data => {
+                const articles = data.docs || data;
+                articlesGlobal = articles;
+                renderTable(articles);
+            })
+            .catch(error => {
+                console.error("Error searching articles:", error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Error searching articles</td></tr>';
+            });
     }
 }
 
