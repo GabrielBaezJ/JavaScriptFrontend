@@ -6,8 +6,14 @@ let articlesGlobal = [];
 fetch("https://javascriptbackend-5115.onrender.com/api/articles")
     .then(res => res.json())
     .then(data => {
-        articlesGlobal = data;
-        renderTable(data);
+        // El backend devuelve un objeto con la propiedad 'docs'
+        const articles = data.docs || data;
+        articlesGlobal = articles;
+        renderTable(articles);
+    })
+    .catch(error => {
+        console.error("Error fetching articles:", error);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading articles</td></tr>';
     });
 
 function formatDate(dateStr) {
