@@ -1,48 +1,99 @@
 const tbody = document.getElementById("data");
 const pdfBtn = document.getElementById("pdfBtn");
 const searchInput = document.getElementById("searchInput");
+const searchForm = document.getElementById("searchForm");
+const loadingIndicator = document.getElementById("loadingIndicator");
+const resultsCount = document.getElementById("resultsCount");
 
 let articlesGlobal = [];
+const API_BASE_URL = "https://javascriptbackend-5115.onrender.com/api/articles";
 
-fetch("https://javascriptbackend-5115.onrender.com/api/articles")
-    .then(res => res.json())
-    .then(data => {
-        // El backend devuelve un objeto con la propiedad 'docs'
-        const articles = data.docs || data;
-        articlesGlobal = articles;
-        renderTable(articles);
-    })
-    .catch(error => {
-        console.error("Error fetching articles:", error);
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Error loading articles</td></tr>';
-    });
+// Load initial articles on page load
+loadArticles();
 
-// Función de búsqueda
-searchInput.addEventListener("input", (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
+// Search form submission
+searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const query = searchInput.value.trim();
     
-    if (searchTerm === "") {
-        renderTable(articlesGlobal);
+    if (query === "") {
+        loadArticles();
     } else {
-        const filtered = articlesGlobal.filter(article => {
-            const title = (article.title_display || "").toLowerCase();
-            const authors = (article.author_display || []).join(" ").toLowerCase();
-            const doi = (article.id || "").toLowerCase();
-            
-            return title.includes(searchTerm) || 
-                   authors.includes(searchTerm) || 
-                   doi.includes(searchTerm);
-        });
-        
-        renderTable(filtered);
+        searchArticles(query);
     }
 });
+
+// Function to load all articles (initial load)
+function loadArticles() {
+    showLoading(true);
+    
+    fetch(API_BASE_URL)
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            const articles = data.docs || data;
+            articlesGlobal = articles;
+            renderTable(articles);
+            updateResultsCount(articles.length, false);
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error("Error fetching articles:", error);
+            showError("Error loading articles. Please try again later.");
+            showLoading(false);
+        });
+}
+
+// Function to search articles via backend API
+function searchArticles(query) {
+    showLoading(true);
+    
+    const searchUrl = `${API_BASE_URL}?search=${encodeURIComponent(query)}`;
+    
+    fetch(searchUrl)
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            const articles = data.docs || data;
+            articlesGlobal = articles;
+            renderTable(articles);
+            updateResultsCount(articles.length, true, query);
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error("Error searching articles:", error);
+            showError("Error searching articles. Please try again.");
+            showLoading(false);
+        });
+}
+
+// Show/hide loading indicator
+function showLoading(show) {
+    if (show) {
+        loadingIndicator.classList.remove("hidden");
+    } else {
+        loadingIndicator.classList.add("hidden");
+    }
+}
+
+// Update results count
+function updateResultsCount(count, isSearch, query = "") {
+    if (isSearch) {
+        resultsCount.textContent = `${count} result${count !== 1 ? 's' : ''} found for "${query}"`;
+    } else {
+        resultsCount.textContent = `${count} article${count !== 1 ? 's' : ''} available`;
+    }
+}
 
 function formatDate(dateStr) {
     if (!dateStr) return "N/A";
 
-    const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     
     const d = new Date(dateStr);
     const day = d.getDate().toString().padStart(2, "0");
@@ -56,7 +107,15 @@ function renderTable(data) {
     tbody.innerHTML = "";
     
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No se encontraron artículos</td></tr>';
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No articles found</h3>
+                    <p>Try searching with different keywords</p>
+                </td>
+            </tr>
+        `;
         return;
     }
     
@@ -79,13 +138,26 @@ function renderTable(data) {
             <td>${authors}</td>
             <td>
                 <a href="https://doi.org/${doi}" target="_blank">
-                    View DOI
+                    <i class="fas fa-external-link-alt"></i> View DOI
                 </a>
             </td>
         `;
 
         tbody.appendChild(tr);
     });
+}
+
+// Show error message
+function showError(message) {
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="empty-state">
+                <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                <h3>Oops! Something went wrong</h3>
+                <p>${message}</p>
+            </td>
+        </tr>
+    `;
 }
 
 /* PDF REPORT */

@@ -1,93 +1,278 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px 0;
 }
 
 .container {
-    width: 90%;
+    max-width: 1200px;
     margin: auto;
-    margin-top: 40px;
+    padding: 0 20px;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    color: white;
+    font-size: 2.5em;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
-.search-container {
+/* Google-Style Search Bar */
+.search-wrapper {
+    max-width: 700px;
+    margin: 0 auto 30px;
+}
+
+.search-box {
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: box-shadow 0.3s ease;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+
+.search-input-wrapper {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
     align-items: center;
-    flex-wrap: wrap;
+    padding: 8px 20px;
+}
+
+.search-icon {
+    color: #9ca3af;
+    font-size: 18px;
+    margin-right: 12px;
 }
 
 #searchInput {
     flex: 1;
-    min-width: 250px;
-    padding: 10px 15px;
-    border: 2px solid #e2e8f0;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: border-color 0.3s;
-}
-
-#searchInput:focus {
+    border: none;
     outline: none;
-    border-color: #2563eb;
+    font-size: 16px;
+    padding: 10px 0;
+    color: #1f2937;
 }
 
 #searchInput::placeholder {
-    color: #94a3b8;
+    color: #9ca3af;
 }
 
-button {
-    background: #2563eb;
+.search-btn {
+    background: #667eea;
     color: white;
     border: none;
-    padding: 10px 18px;
-    border-radius: 5px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
     cursor: pointer;
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    margin-left: 10px;
 }
 
-button:hover {
-    background: #1e40af;
+.search-btn:hover {
+    background: #5568d3;
+    transform: scale(1.1);
+}
+
+.search-btn i {
+    font-size: 18px;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    color: white;
+    font-size: 16px;
+}
+
+.loading-indicator.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Actions Bar */
+.actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pdf-btn {
+    background: white;
+    color: #667eea;
+    border: 2px solid white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pdf-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.results-count {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+/* Table */
+.table-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    overflow: hidden;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
 }
 
 th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 th {
-    background: #f1f5f9;
-    text-align: left;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
 }
 
 a {
-    color: #2563eb;
+    color: #667eea;
     text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
 a:hover {
+    color: #5568d3;
     text-decoration: underline;
 }
 
 .number-cell {
     text-align: center;
     font-weight: bold;
-    color: #64748b;
-    width: 50px;
+    color: #667eea;
+    width: 60px;
+    font-size: 15px;
 }
 
 .date-cell {
     white-space: nowrap;
     font-weight: 500;
+    color: #64748b;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+}
+
+.empty-state i {
+    font-size: 64px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    margin: 10px 0;
+    color: #475569;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    
+    .search-input-wrapper {
+        padding: 6px 15px;
+    }
+    
+    #searchInput {
+        font-size: 14px;
+    }
+    
+    .search-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    th, td {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+    
+    .table-wrapper {
+        overflow-x: auto;
+    }
 }
