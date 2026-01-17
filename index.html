@@ -2,69 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLOS University Articles</title>
     <link rel="stylesheet" href="css/styles.css">
 
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>PLOS University Articles</h1>
+    <h1>University Articles (PLOS)</h1>
 
-    <!-- Google-style Search Bar -->
-    <div class="search-wrapper">
-        <form id="searchForm" class="search-box">
-            <div class="search-input-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Search for articles, authors, topics..."
-                    autocomplete="off"
-                >
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </form>
-        
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="loading-indicator hidden">
-            <div class="spinner"></div>
-            <span>Searching...</span>
-        </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for articles, authors, topics...">
+        <button id="searchBtn">Search</button>
+        <button id="pdfBtn">Generate PDF Report</button>
     </div>
 
-    <!-- PDF Button -->
-    <div class="actions-bar">
-        <button id="pdfBtn" class="pdf-btn">
-            <i class="fas fa-file-pdf"></i>
-            Generate PDF Report
-        </button>
-        <span id="resultsCount" class="results-count"></span>
-    </div>
-
-    <!-- Results Table -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Date</th>
-                    <th>Authors</th>
-                    <th>DOI</th>
-                </tr>
-            </thead>
-            <tbody id="data"></tbody>
-        </table>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Authors</th>
+                <th>DOI</th>
+            </tr>
+        </thead>
+        <tbody id="data"></tbody>
+    </table>
 </div>
 
 <script src="js/main.js"></script>
