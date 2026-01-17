@@ -19,16 +19,19 @@ fetch("https://javascriptbackend-5115.onrender.com/api/articles")
 function formatDate(dateStr) {
     if (!dateStr) return "N/A";
 
+    const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", 
+                    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    
     const d = new Date(dateStr);
     const day = d.getDate().toString().padStart(2, "0");
-    const month = (d.getMonth()+1).toString().padStart(2, "0");
+    const month = months[d.getMonth()];
     const year = d.getFullYear();
 
     return `${day}-${month}-${year}`;
 }
 
 function renderTable(data) {
-    data.forEach(article => {
+    data.forEach((article, index) => {
 
         const title = article.title_display || "No title";
         const date = formatDate(article.publication_date);
@@ -41,8 +44,9 @@ function renderTable(data) {
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
+            <td class="number-cell">${index + 1}</td>
             <td>${title}</td>
-            <td>${date}</td>
+            <td class="date-cell">${date}</td>
             <td>${authors}</td>
             <td>
                 <a href="https://doi.org/${doi}" target="_blank">

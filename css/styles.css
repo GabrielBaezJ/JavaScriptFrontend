@@ -52,3 +52,15 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.number-cell {
+    text-align: center;
+    font-weight: bold;
+    color: #64748b;
+    width: 50px;
+}
+
+.date-cell {
+    white-space: nowrap;
+    font-weight: 500;
+}
